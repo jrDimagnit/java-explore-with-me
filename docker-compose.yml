@@ -1,15 +1,47 @@
 version: '3.1'
 services:
   stats-server:
+    build: stats/stats-server
+    image: stats-server
+    container_name: stats-server
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - spring.datasource.url=jdbc:postgresql://stats-db:5432/ewm-stats
+      - spring.datasource.username=itsmine
+      - spring.datasource.password=1234
+
 
   stats-db:
     image: postgres:14-alpine
+    container_name: stats-db
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=itsmine
+      - POSTGRES_DB=ewm-stats
+
 
   ewm-service:
+    build: ewm-service
+    image: ewm-service
+    container_name: ewm-service
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
+      - stats-server
+    environment:
+      - spring.datasource.url=jdbc:postgresql://ewm-db:5432/ewm
+      - spring.datasource.username=itsmine
+      - spring.datasource.password=1234
+
 
   ewm-db:
     image: postgres:14-alpine
+    container_name: ewm-db
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=itsmine
+      - POSTGRES_DB=ewm
