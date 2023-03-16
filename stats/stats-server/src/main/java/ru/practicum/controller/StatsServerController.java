@@ -17,6 +17,7 @@ import java.util.Collection;
 @Slf4j
 public class StatsServerController {
     private StatsService statsService;
+    private final String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
     @PostMapping(path = "/hit")
     public void addHit(@RequestBody @Valid EndpointHit endpointHit) {
@@ -26,8 +27,8 @@ public class StatsServerController {
     }
 
     @GetMapping(path = "/stats")
-    public Collection<ViewStats> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                          @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+    public Collection<ViewStats> getStats(@RequestParam @DateTimeFormat(pattern = dateFormat) LocalDateTime start,
+                                          @RequestParam @DateTimeFormat(pattern = dateFormat) LocalDateTime end,
                                           @RequestParam(required = false) String[] uris,
                                           @RequestParam(required = false,defaultValue = "false") Boolean unique) {
         log.debug("Get stats with params");
