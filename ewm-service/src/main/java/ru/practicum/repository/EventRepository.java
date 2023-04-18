@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e " +
-            "where e.state = explorewithme.model.event.EventState.PUBLISHED " +
+            "where e.state = ru.practicum.model.event.EventState.PUBLISHED " +
             "and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             "or lower(e.description) like lower(concat('%', ?1, '%'))) " +
             "and e.category.id in ?2 " +
