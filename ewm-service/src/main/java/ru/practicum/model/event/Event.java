@@ -44,7 +44,7 @@ public class Event {
     @Column(nullable = false)
     Boolean paid;
     @Column(name = "participantLimit")
-    Integer participantLimit = 0;
+    Long participantLimit;
     @Column(name = "publishedOn", nullable = false)
     LocalDateTime publishedOn;
     @Column(name = "requestModeration")

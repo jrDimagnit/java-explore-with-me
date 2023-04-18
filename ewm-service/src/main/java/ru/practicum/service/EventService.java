@@ -52,23 +52,19 @@ public class EventService {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now().plusYears(100);
         statClient.hit(request.getRemoteAddr(), request.getRequestURI());
-
         if (sort == null || sort.equals("EVENT_DATE"))
             page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "eventDate"));
         else if (sort.equals("VIEWS"))
             page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "views"));
         else
             throw new BadRequestException(request.getParameterMap().toString());
-
         if (rangeStart != null && rangeEnd != null) {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
         events = eventRepository.getEventsCustom(text, categories, paid, start, end, onlyAvailable, page);
-
         if (events == null)
             events = Page.empty();
-
         return events.stream().map(eventMapper::toEventShortDto).collect(Collectors.toList());
     }
 
@@ -87,9 +83,7 @@ public class EventService {
     public List<EventShortDto> getEventsByUser(Long userId, Integer fromNum, Integer size) {
         Integer from = fromNum >= 0 ? fromNum / size : 0;
         Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "id"));
-
         List<Event> shortEvents = eventRepository.findByUser(userId, page);
-
         return shortEvents.stream().map(eventMapper::toEventShortDto).collect(Collectors.toList());
     }
 
@@ -107,7 +101,6 @@ public class EventService {
 
     public EventFullDto addNewEvent(Long userId, NewEventDto eventDto, HttpServletRequest request) {
         LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), formatter);
-
         if (eventDto.getAnnotation() == null || eventDate.isBefore(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
                 .plusHours(2)))
             throw new BadRequestException(request.getParameterMap().toString());
@@ -115,7 +108,6 @@ public class EventService {
                 .orElseThrow(() -> new NotFoundCategoryException(eventDto.getCategory(), request));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(userId, request));
-
         return eventMapper.toEventFullDto(eventRepository.save(eventMapper.toEvent(eventDto, user, category)));
     }
 
@@ -123,7 +115,6 @@ public class EventService {
         LocalDateTime eventDate = LocalDateTime.parse(eventDto.getEventDate(), formatter);
         long eventId = eventDto.getEventId();
         Event event = checkEventByUser(userId, eventId, req);
-
         if (event.getState() == EventState.PUBLISHED || eventDate.isBefore(LocalDateTime.now()
                 .truncatedTo(ChronoUnit.MINUTES).plusHours(2)))
             throw new BadRequestException(req.getParameterMap().toString());
@@ -131,14 +122,12 @@ public class EventService {
             event.setState(EventState.PENDING);
         event = checkUpdates(event, eventDto.getAnnotation(), eventDto.getDescription(), eventDto.getCategory(),
                 eventDto.getEventDate(), eventDto.getPaid(), eventDto.getParticipantLimit(), eventDto.getTitle(), req);
-
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     public EventFullDto cancelEvent(Long userId, Long eventId, HttpServletRequest request) {
         Event event = checkEventByUser(userId, eventId, request);
         event.setState(EventState.CANCELED);
-
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
@@ -165,9 +154,7 @@ public class EventService {
             end = LocalDateTime.now().plusYears(100);
         else
             end = LocalDateTime.parse(rangeEnd, formatter);
-
         Page<Event> events = eventRepository.getEventsByAdmin(users, eStates, categories, start, end, page);
-
         return events.stream().map(eventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
@@ -188,7 +175,7 @@ public class EventService {
     }
 
     private Event checkUpdates(Event event, String annotation, String description, Long catId, String eventDate,
-                               Boolean paid, Integer participantLimit, String title, HttpServletRequest request) {
+                               Boolean paid, Long participantLimit, String title, HttpServletRequest request) {
         if (annotation != null)
             event.setAnnotation(annotation);
         if (description != null)
@@ -206,7 +193,6 @@ public class EventService {
             event.setParticipantLimit(participantLimit);
         if (title != null)
             event.setTitle(title);
-
         return event;
     }
 
@@ -216,9 +202,7 @@ public class EventService {
                 .isBefore(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusHours(1)) ||
                 !event.getState().equals(EventState.PENDING))
             throw new BadRequestException(request.getParameterMap().toString());
-
         event.setState(EventState.PUBLISHED);
-
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
@@ -227,7 +211,6 @@ public class EventService {
         if (event.getState().equals(EventState.PUBLISHED))
             throw new BadRequestException(request.getParameterMap().toString());
         event.setState(EventState.CANCELED);
-
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
@@ -236,9 +219,9 @@ public class EventService {
         Event event = checkEventByUser(userId, eventId, httpReq);
         Request request = requestRepository.findById(reqId)
                 .orElseThrow(() -> new NotFoundRequestException(reqId, httpReq));
-        Integer limit = event.getParticipantLimit();
+        Long limit = event.getParticipantLimit();
         Long confirmedRequests = event.getConfirmedRequests();
-        if (limit == 0 || !event.getRequestModeration() || Long.valueOf(limit) == confirmedRequests)
+        if (limit == 0 || !event.getRequestModeration() || limit == confirmedRequests)
             throw new BadRequestException(httpReq.getParameterMap().toString());
 
         if (confirmedRequests < event.getParticipantLimit()) {
@@ -249,7 +232,7 @@ public class EventService {
         } else
             throw new BadRequestException(httpReq.getParameterMap().toString());
 
-        if (Long.valueOf(limit) == event.getConfirmedRequests()) {
+        if (limit == event.getConfirmedRequests()) {
             List<Request> reqs = requestRepository.findByEvent(eventId);
             reqs.stream().filter(req -> req.getStatus().equals("PENDING")).forEach((req) -> {
                 req.setStatus("REJECTED");
@@ -264,7 +247,6 @@ public class EventService {
         Event event = checkEventByUser(userId, eventId, httpReq);
         Request request = requestRepository.findById(reqId)
                 .orElseThrow(() -> new NotFoundRequestException(reqId, httpReq));
-
         Long num = event.getConfirmedRequests() - 1;
         event.setConfirmedRequests(num >= 0 ? num : 0);
         request.setStatus("REJECTED");
@@ -303,9 +285,8 @@ public class EventService {
                 .orElseThrow(() -> new NotFoundEventException(eventId, request));
         List<Request> requests = requestRepository.findByRequester(userId);
         List<Long> reqIds = requests.stream().map(Request::getId).collect(Collectors.toList());
-
         if (!event.getState().equals(EventState.PUBLISHED) || event.getInitiator().getId() == userId
-                || event.getConfirmedRequests() == Long.valueOf(event.getParticipantLimit()) || reqIds.contains(userId))
+                || event.getConfirmedRequests() == event.getParticipantLimit() || reqIds.contains(userId))
             throw new BadRequestException(request.getParameterMap().toString());
         Request newRequest = new Request(null, LocalDateTime.now(), eventId, userId, "PENDING");
         if (!event.getRequestModeration())

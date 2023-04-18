@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS event
     location_lat      FLOAT                                   NOT NULL,
     location_lon      FLOAT                                   NOT NULL,
     paid              BOOLEAN                                 NOT NULL,
-    participantLimit  INT                                     NOT NULL,
+    participantLimit  BIGINT                                  NOT NULL,
     publishedOn       TIMESTAMP WITH TIME ZONE                NOT NULL,
     requestModeration BOOLEAN                                 NOT NULL,
     state             VARCHAR(10)                             NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS request
 );
 CREATE TABLE IF NOT EXISTS events_compilations
 (
-    event_id       BIGINT REFERENCES event(id),
-    compilation_id BIGINT REFERENCES compilation(id),
+    event_id       BIGINT REFERENCES event (id),
+    compilation_id BIGINT REFERENCES compilation (id),
     PRIMARY KEY (event_id, compilation_id)
 );

@@ -18,6 +18,6 @@ public class UpdateEventUserRequest {
     Long category;
     String eventDate;
     Boolean paid;
-    Integer participantLimit;
+    Long participantLimit;
     String title;
 }
