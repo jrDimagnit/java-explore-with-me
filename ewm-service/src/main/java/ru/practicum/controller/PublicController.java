@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.model.category.CategoryDto;
+import ru.practicum.model.category.Category;
 import ru.practicum.model.compilation.CompilationDto;
 import ru.practicum.model.event.EventFullDto;
 import ru.practicum.model.event.EventShortDto;
@@ -64,14 +64,14 @@ public class PublicController {
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") Integer from,
+    public List<Category> getCategories(@RequestParam(defaultValue = "0") Integer from,
                                            @RequestParam(defaultValue = "10") Integer size) {
         log.info("Get public Categories");
         return categoryService.getCategories(from, size);
     }
 
     @GetMapping("/categories/{catId}")
-    public CategoryDto getCategory(@PathVariable("catId") Long catId, HttpServletRequest request) {
+    public Category getCategory(@PathVariable("catId") Long catId, HttpServletRequest request) {
         log.info("Get public categiry " + catId);
         return categoryService.getCategory(catId, request);
     }

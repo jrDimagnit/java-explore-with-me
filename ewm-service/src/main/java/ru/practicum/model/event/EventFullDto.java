@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.model.Location;
-import ru.practicum.model.category.CategoryDto;
+import ru.practicum.model.category.Category;
 import ru.practicum.model.user.UserDto;
 
 @Data
@@ -15,7 +15,7 @@ public class EventFullDto {
     Long id;
     String annotation;
     String description;
-    CategoryDto category;
+    Category category;
     Long confirmedRequests;
     String createdOn;
     String eventDate;

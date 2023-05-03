@@ -3,7 +3,6 @@ package ru.practicum.model.event;
 import org.springframework.stereotype.Service;
 import ru.practicum.model.Location;
 import ru.practicum.model.category.Category;
-import ru.practicum.model.category.CategoryMapper;
 import ru.practicum.model.user.User;
 import ru.practicum.model.user.UserMapper;
 
@@ -12,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 public class EventMapper {
-    private final CategoryMapper categoryMapper = new CategoryMapper();
     private final UserMapper userMapper = new UserMapper();
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -20,7 +18,7 @@ public class EventMapper {
         return new EventShortDto(
                 event.getId(),
                 event.getAnnotation(),
-                categoryMapper.toCategoryDto(event.getCategory()),
+                event.getCategory(),
                 event.getConfirmedRequests(),
                 event.getEventDate().format(formatter),
                 userMapper.toUserShortDto(event.getInitiator()),
@@ -34,7 +32,7 @@ public class EventMapper {
                 event.getId(),
                 event.getAnnotation(),
                 event.getDescription(),
-                categoryMapper.toCategoryDto(event.getCategory()),
+                event.getCategory(),
                 event.getConfirmedRequests(),
                 event.getCreatedOn().format(formatter),
                 event.getEventDate().format(formatter),

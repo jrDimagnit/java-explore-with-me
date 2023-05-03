@@ -3,7 +3,7 @@ package ru.practicum.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.category.CategoryDto;
+import ru.practicum.model.category.Category;
 import ru.practicum.model.category.NewCategoryDto;
 import ru.practicum.model.compilation.CompilationDto;
 import ru.practicum.model.compilation.NewCompilationDto;
@@ -91,17 +91,17 @@ public class AdminController {
     }
 
     @PostMapping("/categories")
-    CategoryDto postCategory(@RequestBody @Valid NewCategoryDto newCategoryDto, HttpServletRequest request) {
+    Category postCategory(@RequestBody @Valid NewCategoryDto newCategoryDto, HttpServletRequest request) {
         log.info("Post category " + newCategoryDto);
         return categoryService.addNewCategory(newCategoryDto, request);
     }
 
     @PatchMapping("/categories/{catId}")
-    CategoryDto patchCategory(@RequestBody @Valid CategoryDto categoryDto,
-                              @PathVariable Long catId,
-                              HttpServletRequest request) {
-        log.info("Update category " + categoryDto);
-        return categoryService.modifyCategory(categoryDto, request, catId);
+    Category patchCategory(@RequestBody @Valid Category category,
+                           @PathVariable Long catId,
+                           HttpServletRequest request) {
+        log.info("Update category " + category);
+        return categoryService.modifyCategory(category, request, catId);
     }
 
     @DeleteMapping("/categories/{catId}")

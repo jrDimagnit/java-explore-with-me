@@ -11,7 +11,6 @@ import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundCategoryException;
 import ru.practicum.model.category.Category;
-import ru.practicum.model.category.CategoryDto;
 import ru.practicum.model.category.CategoryMapper;
 import ru.practicum.model.category.NewCategoryDto;
 import ru.practicum.repository.CategoryRepository;
@@ -31,18 +30,17 @@ public class CategoryService {
 
 
     @Transactional(readOnly = true)
-    public List<CategoryDto> getCategories(int fromNum, int size) {
+    public List<Category> getCategories(int fromNum, int size) {
         int from = fromNum >= 0 ? fromNum / size : 0;
         Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<Category> categories = categoryRepository.findAll(page);
 
-        return categories.stream().map(categoryMapper::toCategoryDto).collect(Collectors.toList());
+        return categories.stream().collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public CategoryDto getCategory(Long catId, HttpServletRequest request) {
-        Category category = checkCategory(catId, request);
-        return categoryMapper.toCategoryDto(category);
+    public Category getCategory(Long catId, HttpServletRequest request) {
+        return checkCategory(catId, request);
     }
 
     public Category checkCategory(Long catId, HttpServletRequest request) {
@@ -54,9 +52,9 @@ public class CategoryService {
             throw new NotFoundCategoryException(catId, request);
     }
 
-    public CategoryDto addNewCategory(NewCategoryDto newCategory, HttpServletRequest request) {
+    public Category addNewCategory(NewCategoryDto newCategory, HttpServletRequest request) {
         checkCategoryName(newCategory.getName(), request);
-        return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(newCategory)));
+        return categoryRepository.save(categoryMapper.toCategory(newCategory));
     }
 
     private void checkCategoryName(String catName, HttpServletRequest request) {
@@ -67,11 +65,11 @@ public class CategoryService {
                     catName, request.getRequestURI()));
     }
 
-    public CategoryDto modifyCategory(CategoryDto categoryDto, HttpServletRequest request, Long catId) {
-        checkCategoryName(categoryDto.getName(), request);
-        Category upCat = categoryMapper.toCategory(categoryDto);
+    public Category modifyCategory(Category category, HttpServletRequest request, Long catId) {
+        checkCategoryName(category.getName(), request);
+        Category upCat = category;
         upCat.setId(catId);
-        return categoryMapper.toCategoryDto(categoryRepository.save(upCat));
+        return categoryRepository.save(upCat);
     }
 
     public Set<String> getCategoryNames() {

@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.model.category.Category;
 import ru.practicum.model.user.UserDto;
-import ru.practicum.model.category.CategoryDto;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +13,7 @@ import ru.practicum.model.category.CategoryDto;
 public class EventShortDto {
     Long id;
     String annotation;
-    CategoryDto category;
+    Category category;
     Long confirmedRequests;
     String eventDate;
     UserDto initiator;
