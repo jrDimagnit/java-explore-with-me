@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class PublicController {
     private EventService eventService;
     private CompilationService compilationService;
@@ -25,7 +27,7 @@ public class PublicController {
 
     @GetMapping("/events")
     List<EventShortDto> getEvents(@RequestParam(required = false) String text,
-                                  @RequestParam(required = false) Long[] categories,
+                                  @RequestParam(required = false) List<Long> categories,
                                   @RequestParam(required = false) Boolean paid,
                                   @RequestParam(required = false) String rangeStart,
                                   @RequestParam(required = false) String rangeEnd,

@@ -1,12 +1,15 @@
 package ru.practicum.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.event.EventFullDto;
 import ru.practicum.model.event.EventShortDto;
 import ru.practicum.model.event.NewEventDto;
 import ru.practicum.model.event.UpdateEventUserRequest;
+import ru.practicum.model.request.EventRequestsByStatusResponseDto;
 import ru.practicum.model.request.ParticipationRequestDto;
+import ru.practicum.model.request.UpdateEventParticipationStatusRequestDto;
 import ru.practicum.service.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,12 +18,10 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 @RequestMapping(path = "/users/{userId}")
 public class PrivateController {
     private EventService eventService;
-    private CategoryService categoryService;
-    private UserService userService;
-    private CompilationService compilationService;
 
     @GetMapping("/events")
     List<EventShortDto> getEvents(@PathVariable Long userId,
@@ -40,7 +41,7 @@ public class PrivateController {
     @PostMapping("/events")
     EventFullDto postEvent(@PathVariable Long userId,
                            @RequestBody @Valid NewEventDto newEventDto, HttpServletRequest request) {
-        log.info("Create event by user " + userId);
+        log.info("Create event by user {} with event {}", userId, newEventDto);
         return eventService.addNewEvent(userId, newEventDto, request);
     }
 
@@ -60,25 +61,19 @@ public class PrivateController {
 
     @GetMapping("/events/{eventId}/requests")
     List<ParticipationRequestDto> getRequests(@PathVariable Long userId,
-                                              @PathVariable Long eventId) {
+                                              @PathVariable Long eventId, HttpServletRequest request) {
         log.info("get event by user " + userId);
-        return eventService.getEventRequestsByUser(userId, eventId);
+        return eventService.getEventRequestsByUser(userId, eventId, request);
     }
 
-    @PatchMapping("/events/{eventId}/requests/{reqId}/confirm")
-    ParticipationRequestDto patchRequestConfirmation(@PathVariable Long userId,
-                                                     @PathVariable Long eventId,
-                                                     @PathVariable Long reqId, HttpServletRequest request) {
-        log.info("confirm event by id " + reqId);
-        return eventService.confirmEventRequest(userId, eventId, reqId, request);
-    }
-
-    @PatchMapping("/events/{eventId}/requests/{reqId}/reject")
-    ParticipationRequestDto patchRequestRejection(@PathVariable Long userId,
-                                                  @PathVariable Long eventId,
-                                                  @PathVariable Long reqId, HttpServletRequest request) {
-        log.info("reject event by id " + reqId);
-        return eventService.rejectEventRequest(userId, eventId, reqId, request);
+    @PatchMapping("events/{eventId}/requests")
+    public EventRequestsByStatusResponseDto updateEventParticipationRequestStatus(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody @Valid UpdateEventParticipationStatusRequestDto requestStatusDto,
+            HttpServletRequest request) {
+        log.info("reject event by user  " + userId);
+        return eventService.updateEventParticipationRequestStatus(userId, eventId, requestStatusDto, request);
     }
 
     @GetMapping("/requests")

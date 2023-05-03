@@ -47,7 +47,6 @@ public class CompilationService {
         for (Compilation compilation : compilations) {
             compilationDtoList.add(compilationMapper.toCompilationDto(compilation));
         }
-
         return compilationDtoList;
     }
 
@@ -69,35 +68,28 @@ public class CompilationService {
                 compilationRepository.save(compilationMapper.toCompilation(newCompilationDto, events)));
     }
 
-    public void addEventToCompilation(Long compId, Long eventId, HttpServletRequest request) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundCompilationException(compId, request));
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundEventException(eventId, request));
-        compilation.getEvents().add(event);
-
-        compilationRepository.save(compilation);
-    }
-
-    public void pin(Long compId) {
-        compilationRepository.changeCompilationPin(compId, true);
+    public CompilationDto patchCompilation(NewCompilationDto newCompilationDto,
+                                           Long compId, HttpServletRequest request) {
+        Compilation checkComp = checkCompilation(compId, request);
+        if (newCompilationDto.getPinned() != null) {
+            checkComp.setPinned(newCompilationDto.getPinned());
+        }
+        if (newCompilationDto.getTitle() != null) {
+            checkComp.setTitle(newCompilationDto.getTitle());
+        }
+        if (newCompilationDto.getEvents() != null) {
+            List<Event> listEvent = new ArrayList<>();
+            for (Long id : newCompilationDto.getEvents()) {
+                listEvent.add(eventRepository.findById(id)
+                        .orElseThrow(() -> new NotFoundEventException(id, request)));
+            }
+            checkComp.setEvents(listEvent);
+        }
+        return compilationMapper.toCompilationDto(compilationRepository.save(checkComp));
     }
 
     public void deleteCompilation(Long compId) {
         compilationRepository.deleteById(compId);
     }
 
-    public void deleteEventFromCompilation(Long compId, Long eventId, HttpServletRequest request) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundCompilationException(compId, request));
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundEventException(eventId, request));
-        compilation.getEvents().remove(event);
-
-        compilationRepository.save(compilation);
-    }
-
-    public void unpin(Long compId) {
-        compilationRepository.changeCompilationPin(compId, false);
-    }
 }

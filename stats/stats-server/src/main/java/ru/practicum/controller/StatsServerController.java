@@ -22,7 +22,6 @@ public class StatsServerController {
     @PostMapping(path = "/hit")
     public void addHit(@RequestBody @Valid EndpointHit endpointHit) {
         log.debug("Get endpoint {}", endpointHit);
-        endpointHit.setIp("127.0.0.1");
         statsService.addHit(endpointHit);
     }
 

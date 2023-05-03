@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e " +
-            "where e.state = explorewithme.model.event.EventState.PUBLISHED " +
+            "where e.state = ru.practicum.model.event.EventState.PUBLISHED " +
             "and (lower(e.annotation) like lower(concat('%', ?1, '%')) " +
             "or lower(e.description) like lower(concat('%', ?1, '%'))) " +
             "and e.category.id in ?2 " +
@@ -22,7 +22,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and (e.eventDate between ?4 and ?5) " +
             "and ((?6 = false) or (e.participantLimit = 0) " +
             "or (?6 = true and e.confirmedRequests < e.participantLimit))")
-    Page<Event> getEventsCustom(String text, Long[] categories, Boolean paid, LocalDateTime rangeStart,
+    Page<Event> getEventsCustom(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                 LocalDateTime rangeEnd, Boolean onlyAvailable, Pageable page);
 
     @Query("select e from Event e " +
@@ -34,6 +34,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and e.state in ?2 " +
             "and e.category.id in ?3 " +
             "and (e.eventDate between ?4 and ?5)")
-    Page<Event> getEventsByAdmin(Long[] users, List<EventState> states, Long[] categories, LocalDateTime rangeStart,
+    Page<Event> getEventsByAdmin(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart,
                                  LocalDateTime rangeEnd, Pageable page);
 }

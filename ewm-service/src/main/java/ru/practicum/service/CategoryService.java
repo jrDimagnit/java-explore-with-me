@@ -67,12 +67,11 @@ public class CategoryService {
                     catName, request.getRequestURI()));
     }
 
-    public CategoryDto modifyCategory(CategoryDto categoryDto, HttpServletRequest request) {
-        if (categoryDto.getId() <= 0)
-            throw new BadRequestException(request.getParameterMap().toString());
+    public CategoryDto modifyCategory(CategoryDto categoryDto, HttpServletRequest request, Long catId) {
         checkCategoryName(categoryDto.getName(), request);
-
-        return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(categoryDto)));
+        Category upCat = categoryMapper.toCategory(categoryDto);
+        upCat.setId(catId);
+        return categoryMapper.toCategoryDto(categoryRepository.save(upCat));
     }
 
     public Set<String> getCategoryNames() {

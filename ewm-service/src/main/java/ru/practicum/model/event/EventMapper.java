@@ -12,8 +12,8 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 public class EventMapper {
-    private CategoryMapper categoryMapper;
-    private UserMapper userMapper;
+    private final CategoryMapper categoryMapper = new CategoryMapper();
+    private final UserMapper userMapper = new UserMapper();
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public EventShortDto toEventShortDto(Event event) {

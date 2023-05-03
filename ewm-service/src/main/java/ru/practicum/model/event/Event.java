@@ -28,14 +28,14 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     Category category;
-    @Column(name = "confirmedRequests")
+    @Column(name = "confirmed_requests")
     Long confirmedRequests;
     @Column(name = "created")
     LocalDateTime createdOn;
-    @Column(name = "eventDate", nullable = false)
+    @Column(name = "event_date", nullable = false)
     LocalDateTime eventDate;
     @ManyToOne
-    @JoinColumn(name = "initiator", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     User initiator;
     @Column(nullable = false)
     Float lat;
@@ -43,11 +43,11 @@ public class Event {
     Float lon;
     @Column(nullable = false)
     Boolean paid;
-    @Column(name = "participantLimit")
-    Integer participantLimit = 0;
-    @Column(name = "publishedOn", nullable = false)
+    @Column(name = "participation_limit")
+    Long participantLimit;
+    @Column(name = "published_date", nullable = false)
     LocalDateTime publishedOn;
-    @Column(name = "requestModeration")
+    @Column(name = "moderation")
     Boolean requestModeration = true;
     @Enumerated(EnumType.STRING)
     EventState state;
